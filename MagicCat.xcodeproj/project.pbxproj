@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		981A7B4B2222F211001FD565 /* Level2.sks in Resources */ = {isa = PBXBuildFile; fileRef = 981A7B4A2222F210001FD565 /* Level2.sks */; };
+		981A7B4D222350A2001FD565 /* GameOver.sks in Resources */ = {isa = PBXBuildFile; fileRef = 981A7B4C222350A2001FD565 /* GameOver.sks */; };
 		988D6F00222196A60054EBEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988D6EFF222196A60054EBEF /* AppDelegate.swift */; };
 		988D6F02222196A60054EBEF /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 988D6F01222196A60054EBEF /* GameScene.sks */; };
 		988D6F04222196A60054EBEF /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 988D6F03222196A60054EBEF /* Actions.sks */; };
@@ -22,6 +23,7 @@
 
 /* Begin PBXFileReference section */
 		981A7B4A2222F210001FD565 /* Level2.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Level2.sks; sourceTree = "<group>"; };
+		981A7B4C222350A2001FD565 /* GameOver.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameOver.sks; sourceTree = "<group>"; };
 		988D6EFC222196A60054EBEF /* MagicCat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MagicCat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		988D6EFF222196A60054EBEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		988D6F01222196A60054EBEF /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 			children = (
 				988D6EFF222196A60054EBEF /* AppDelegate.swift */,
 				988D6F01222196A60054EBEF /* GameScene.sks */,
+				981A7B4C222350A2001FD565 /* GameOver.sks */,
 				988D6F03222196A60054EBEF /* Actions.sks */,
 				988D6F1922219D4F0054EBEF /* Point.swift */,
 				981A7B4A2222F210001FD565 /* Level2.sks */,
@@ -141,6 +144,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				988D6F182221981A0054EBEF /* Smashing-Things.atlas in Resources */,
+				981A7B4D222350A2001FD565 /* GameOver.sks in Resources */,
 				988D6F0B222196A60054EBEF /* Main.storyboard in Resources */,
 				988D6F02222196A60054EBEF /* GameScene.sks in Resources */,
 				988D6F0D222196A80054EBEF /* Assets.xcassets in Resources */,
