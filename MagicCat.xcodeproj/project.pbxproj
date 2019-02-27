@@ -19,6 +19,7 @@
 		988D6F10222196A80054EBEF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 988D6F0E222196A80054EBEF /* LaunchScreen.storyboard */; };
 		988D6F182221981A0054EBEF /* Smashing-Things.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 988D6F172221981A0054EBEF /* Smashing-Things.atlas */; };
 		988D6F1A22219D4F0054EBEF /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988D6F1922219D4F0054EBEF /* Point.swift */; };
+		98FD33AB2225EC8A0058E3CB /* hauntedhouse.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 98FD33AA2225EC8A0058E3CB /* hauntedhouse.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		988D6F11222196A80054EBEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		988D6F172221981A0054EBEF /* Smashing-Things.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = "Smashing-Things.atlas"; sourceTree = "<group>"; };
 		988D6F1922219D4F0054EBEF /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
+		98FD33AA2225EC8A0058E3CB /* hauntedhouse.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = hauntedhouse.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				988D6F01222196A60054EBEF /* GameScene.sks */,
 				981A7B4C222350A2001FD565 /* GameOver.sks */,
 				988D6F03222196A60054EBEF /* Actions.sks */,
+				98FD33AA2225EC8A0058E3CB /* hauntedhouse.mp3 */,
 				988D6F1922219D4F0054EBEF /* Point.swift */,
 				981A7B4A2222F210001FD565 /* Level2.sks */,
 				988D6F05222196A60054EBEF /* GameScene.swift */,
@@ -144,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				988D6F182221981A0054EBEF /* Smashing-Things.atlas in Resources */,
+				98FD33AB2225EC8A0058E3CB /* hauntedhouse.mp3 in Resources */,
 				981A7B4D222350A2001FD565 /* GameOver.sks in Resources */,
 				988D6F0B222196A60054EBEF /* Main.storyboard in Resources */,
 				988D6F02222196A60054EBEF /* GameScene.sks in Resources */,
