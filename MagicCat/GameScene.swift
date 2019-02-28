@@ -13,8 +13,14 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     
     var cat1 = SKSpriteNode(imageNamed: "cat")
     var cat2 = SKSpriteNode(imageNamed: "cat")
+    var cat3 = SKSpriteNode(imageNamed: "cat")
     var player = SKSpriteNode(imageNamed: "player")
     
+    var Level2Cat1 = SKSpriteNode(imageNamed: "cat")
+    var Level2Cat2 = SKSpriteNode(imageNamed: "cat")
+    
+    //for level-2
+    var LevelComplete:Bool = false
     
     
     //MARK:for drawing stroke
@@ -24,10 +30,29 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     var line2Node = SKShapeNode()
     var line3Node = SKShapeNode()
     
+    //for Level-2
+    var level2line1 = SKShapeNode()
+    var level2line1_angle = 0.0
+    var level2line2 = SKShapeNode()
+    var level2line2_angle = 0.0
+    var level2line3 = SKShapeNode()
+    var level2line3_angle = 90.0
+    
+    var totalSymbols = 3
+    var drawnSymbols = 0
+    
+    var Level2RandomXCat1 = 0
+    var Level2RandomYCat1 = 0
+    
+    var Level2RandomXCat2 = 0
+    var Level2RandomYCat2 = 0
+    
     var livesNode = SKLabelNode()
     var scoreNode = SKLabelNode()
     
     var restartNode = SKLabelNode()
+    
+     var circle = SKShapeNode()
     //GAME STATES
         //drawing circles for extra life
         var circleShown = false
@@ -66,6 +91,8 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         var lives = 2
         var score = 0
     
+        var drawLives:Bool = false
+    
     //    randomIndex
     override func didMove(to view: SKView) {
         if(lives == 0) {
@@ -74,22 +101,6 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
            
             // initialize delegate
             self.physicsWorld.contactDelegate = self
-            
-            
-            //configure drawing line
-            self.lineNode.lineWidth = 8
-            self.lineNode.lineCap = .round
-            self.lineNode.strokeColor = UIColor.green
-            addChild(lineNode)
-            
-            //configre lives
-            self.livesNode.text = "Lives:\(lives)"
-            self.livesNode.position.x = -539
-            self.livesNode.position.y = 321
-            self.livesNode.fontSize = 50
-            self.livesNode.fontColor = UIColor.red
-            self.livesNode.fontName = "AvenirNext-Bold"
-            addChild(livesNode)
             
             //configre score
             self.scoreNode.text = "Score:\(score)"
@@ -100,7 +111,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             self.scoreNode.fontName = "AvenirNext-Bold"
             addChild(scoreNode)
             
-            //configre score
+            //configre Restart
             self.restartNode.text = "RESTART"
             self.restartNode.position.x = 560
             self.restartNode.position.y = 327
@@ -109,36 +120,42 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             self.restartNode.fontName = "AvenirNext-Bold"
             addChild(restartNode)
             
-           
-            //configre line-1
-            line1()
-            //configre line-2
-            line2()
-            //            //spawn cats every 3 seconds
-            //            //spawncats()
+            //configre lives
+            self.livesNode.text = "Lives:\(lives)"
+            self.livesNode.position.x = -539
+            self.livesNode.position.y = 321
+            self.livesNode.fontSize = 50
+            self.livesNode.fontColor = UIColor.red
+            self.livesNode.fontName = "AvenirNext-Bold"
+            addChild(livesNode)
             
-            //        run(SKAction.sequence([
-            //            SKAction.run() {[weak self] in self?.spawncats()},
-            //            SKAction.wait(forDuration: 5)
-            //            ]))
-            //line3()
             
-            //add music
-//            let playSound = SKAction.playSoundFileNamed("hauntedhouse", waitForCompletion: false)
-//            run(playSound)
-            
+            print("LevelCoomplater\(LevelComplete)")
+            if(LevelComplete == true) {
+                //generate random cat-1
+                randomCat1()
+                //generate random cat-2
+                randomCat2()
+            } else {
+                //configure drawing line
+                self.lineNode.lineWidth = 8
+                self.lineNode.lineCap = .round
+                self.lineNode.strokeColor = UIColor.green
+                addChild(lineNode)
+                //configre line-1
+                line1()
+                //configre line-2
+                line2()
+            }
+          
         }
-        
-        
-        
         
     }
     
     override func update(_ currentTime: TimeInterval) {
+        //background music
         let playSound = SKAction.playSoundFileNamed("hauntedhouse", waitForCompletion: false)
         run(playSound)
-        
-        
         
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -148,7 +165,11 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         let mouseposition = touch.location(in: self)
         print("Finger starting position: \(mouseposition)")
         self.mouseStartingPosition = mouseposition
-        circleposition(mouseposition:mouseposition)
+        if(drawLives == true) {
+                circleposition(mouseposition:mouseposition)
+        } else {
+            print("drawLives\(drawLives)")
+        }
         
         if(restartNode.contains(mouseposition)){
             print("restart button is pressed")
@@ -163,6 +184,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         }
         let mouseposition = touch.location(in: self)
         print("Finger Moved position: \(mouseposition)")
+        
         //draw a line
         let path = UIBezierPath()
         path.move(to: self.mouseStartingPosition)
@@ -173,6 +195,13 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         guard let touch = touches.first else{
             return
         }
+        if(lives == 1){
+            cat3.removeFromParent()
+            lives = lives + 1
+            circle.path = nil
+            livesNode.text = "Lives:\(lives)"
+            print("LIves is 1")
+        }
         let mouseLocation = touch.location(in: self)
         print("Finger ending position: \(mouseLocation)")
         // 1. get the ending position of the finger
@@ -181,66 +210,67 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         let diffX = drawingEndingPosition.x - self.mouseStartingPosition.x
         let diffY = drawingEndingPosition.y - self.mouseStartingPosition.y
         
-        if(diffX == 0.0 && diffY == 0.0){
-            let direction = CGVector(dx: diffX, dy: diffY)
-            return
-        }
-        else {
-            //3.find angle between original coordinates and ending coordinates
-            var angle = atan2(diffY,diffX)
+        if(LevelComplete == true) {
             
-            var finalangle = angle * 60
-            print("angle is:\(finalangle)")
-            // 4. draw a line based on that coordinates
-           
-            let direction = CGVector(dx: diffX, dy: diffY)
-            //horizontal angle for horizontal line if angle is nearer to 180 and 0 ...finalangle will be consider as 0.
-            if((finalangle >= 0.0 && finalangle <= 15.0) ||
-                (finalangle <= 0.0 && finalangle >= -15.0)) {
-                print("Stright Horizontal Line Drawn")
-                finalangle = 0
-            }else if((finalangle <= 190.0 && finalangle >= 170.0) ||
-                (finalangle >= -190.0 && finalangle <= -170.0)){
-                print("Stright Horizontal Line Drawn")
-                finalangle = 0
+        } else if(LevelComplete == false){
+            if(diffX == 0.0 && diffY == 0.0){
+                let direction = CGVector(dx: diffX, dy: diffY)
+                return
             }
-                //vertical angle for vertical line if angle is nearer to 90 and -90 ...finalangle will be consider as 90.
-            else if(finalangle >= 90 && finalangle <= 100) ||
-                (finalangle <= 90 && finalangle >= 80){
-                print("Staright Vertical Line Drawn")
-                finalangle = 90
-            }else if(finalangle <= -90 && finalangle >= -100) || (finalangle >= -90 && finalangle <= -80) {
-                print("Staright Vertical Line Drawn")
-                finalangle = 90
-            }else {
-                print("Angle out range")
+            else {
+                //3.find angle between original coordinates and ending coordinates
+                var angle = atan2(diffY,diffX)
+                var finalangle = angle * 60
+                print("angle is:\(finalangle)")
+                // 4. draw a line based on that coordinates
+                let direction = CGVector(dx: diffX, dy: diffY)
+                //horizontal angle for horizontal line if angle is nearer to 180 and 0 ...finalangle will be consider as 0.
+                if((finalangle >= 0.0 && finalangle <= 15.0) ||
+                    (finalangle <= 0.0 && finalangle >= -15.0)) {
+                    print("Stright Horizontal Line Drawn")
+                    finalangle = 0
+                }else if((finalangle <= 190.0 && finalangle >= 170.0) ||
+                    (finalangle >= -190.0 && finalangle <= -170.0)){
+                    print("Stright Horizontal Line Drawn")
+                    finalangle = 0
+                }
+                    //vertical angle for vertical line if angle is nearer to 90 and -90 ...finalangle will be consider as 90.
+                else if(finalangle >= 90 && finalangle <= 100) ||
+                    (finalangle <= 90 && finalangle >= 80){
+                    print("Staright Vertical Line Drawn")
+                    finalangle = 90
+                }else if(finalangle <= -90 && finalangle >= -100) || (finalangle >= -90 && finalangle <= -80) {
+                    print("Staright Vertical Line Drawn")
+                    finalangle = 90
+                }else {
+                    print("Angle out range")
+                }
+                print("Final Angle Drawn is: \(finalangle)")
+                print("Cat Angle \(angel_cat)")
+                // 5. remove the line form the drawing
+                self.lineNode.path = nil
+                //check if catangle and finalangle matches
+                if(angel_cat == Double(finalangle)) {
+                    //remove line and cat from parent if angle are same
+                    self.line1Node.path = nil
+                    print("Red Line cleared")
+                    self.childNode(withName: "cat2")?.removeFromParent()
+                    self.score = score + 10
+                    self.scoreNode.text = "score:\(score)"
+                    nodes_level1 = nodes_level1 - 1
+                }
+                else if(angle_cat1 == Double(finalangle)) {
+                    self.line2Node.path = nil
+                    print("Blue Line cleared")
+                    self.childNode(withName: "cat1")?.removeFromParent()
+                    self.score = score + 10
+                    self.scoreNode.text = "score:\(score)"
+                    nodes_level1 = nodes_level1 - 1
+                }
+                //check for total nodes of the scene
+                print("nodes_level1: \(nodes_level1)")
+                totalnodes()
             }
-            print("Final Angle Drawn is: \(finalangle)")
-            print("Cat Angle \(angel_cat)")
-            // 5. remove the line form the drawing
-            self.lineNode.path = nil
-            
-            //check if catangle and finalangle matches
-            if(angel_cat == Double(finalangle)) {
-                //remove line and cat from parent if angle are same
-                self.line1Node.path = nil
-                print("Red Line cleared")
-                self.childNode(withName: "cat2")?.removeFromParent()
-                self.score = score + 10
-                self.scoreNode.text = "score:\(score)"
-                nodes_level1 = nodes_level1 - 1
-            }
-            else if(angle_cat1 == Double(finalangle)) {
-                self.line2Node.path = nil
-                print("Blue Line cleared")
-                self.childNode(withName: "cat1")?.removeFromParent()
-                self.score = score + 10
-                self.scoreNode.text = "score:\(score)"
-                nodes_level1 = nodes_level1 - 1
-            }
-            //check for total nodes of the scene
-            print("nodes_level1: \(nodes_level1)")
-            totalnodes()
         }
         
     }
@@ -254,10 +284,17 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             message.fontName = "AvenirNext-Bold"
             addChild(message)
             print("Next Level")
+            LevelComplete = true
             
             //redirect to next level from the restart function
-            perform(#selector(GameScene.nextLevel), with: nil,afterDelay:2)
-            
+            if(LevelComplete == true) {
+                
+                perform(#selector(GameScene.nextLevel), with: nil,afterDelay:2)
+                 print("LevelCoomplater\(LevelComplete)")
+            }
+            else if(LevelComplete == false) {
+                perform(#selector(GameScene.restartGame), with: nil,afterDelay:2)
+            }
         }
     }
     @objc func nextLevel() {
@@ -274,7 +311,6 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         GameOvermessage.fontSize = 100
         GameOvermessage.fontName = "AvenirNext-Bold"
         addChild(GameOvermessage)
-        
         perform(#selector(GameScene.restartGame), with: nil,afterDelay: 0)
         
     }
@@ -297,9 +333,6 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             gameOver()
        
         } else {
-            
-            
-            
             if(nodeA?.name == "player") {
                 print("Player hit: \(nodeB?.name)")
                 if(nodeB?.name == "cat1" || nodeB?.name == "cat2") {
@@ -327,64 +360,53 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     }
     
     func detectCollision() {
-        
-        
-        
-        //delete cat-1
-        self.childNode(withName: "cat1")?.removeFromParent()
-        
-        //for line-1
-        let path = UIBezierPath()
-        path.move(to: CGPoint(x: moveToLine1X, y: moveToLine1Y))
-        path.addLine(to: CGPoint(x:addLine1X, y:addLine1Y))
-        self.line1Node.path = path.cgPath
-        
-        let path2 = UIBezierPath()
-        path2.move(to: CGPoint(x:moveToLine2X , y: moveToLine2Y))
-        path2.addLine(to: CGPoint(x: addLine2X, y: addLine2Y))
-        self.line2Node.path = path2.cgPath
-        
-        cat1.position = CGPoint(x: CGFloat(-422.193), y: CGFloat(-80.956))
-        
-        //hitbox for randomCAT
-        let bodysize = CGSize(width: cat1.size.width, height: cat1.size.height)
-        cat1.physicsBody = SKPhysicsBody(rectangleOf: bodysize)
-        cat1.physicsBody?.isDynamic = false
-        cat1.name = "cat1"
-        addChild(cat1)
-        
-        let Cat1Movement1 = SKAction.move(to: CGPoint(x: -20, y: 0), duration: 20)
-        cat1.run(Cat1Movement1)
-        let Cat1Movement2 = SKAction.move(to: CGPoint(x: -10, y: 0), duration: 20)
-        cat1.run(Cat1Movement2)
-        
-        
-        
-        self.childNode(withName: "cat2")?.removeFromParent()
-        
-        cat2.position = CGPoint(x: CGFloat(408.206), y: CGFloat(-98.531))
-        
-        //hitbox for randomCAT
-        let cat2hitbox = CGSize(width: cat2.size.width, height: cat2.size.height)
-        cat2.physicsBody = SKPhysicsBody(rectangleOf: cat2hitbox)
-        cat2.physicsBody?.isDynamic = false
-        cat2.name = "cat2"
-        addChild(cat2)
-        
-        
-        
-        let Cat2Movement1 = SKAction.move(to: CGPoint(x: -26, y: 0), duration: 20)
-        cat2.run(Cat2Movement1)
-        let Cat2Movement2 = SKAction.move(to: CGPoint(x: 20, y: 0), duration: 20)
-        cat2.run(Cat2Movement2)
-        lives = lives - 1
-        self.livesNode.text = "Lives:\(lives)"
-        print("total :\(lives)")
-        
-        if(lives == 1) {
-            print("DID BEGIN lIVES")
-            getLives()
+        if(LevelComplete == true) {
+            
+        } else if(LevelComplete == false) {
+            //delete cat-1
+            self.childNode(withName: "cat1")?.removeFromParent()
+            //for line-1
+            let path = UIBezierPath()
+            path.move(to: CGPoint(x: moveToLine1X, y: moveToLine1Y))
+            path.addLine(to: CGPoint(x:addLine1X, y:addLine1Y))
+            self.line1Node.path = path.cgPath
+            let path2 = UIBezierPath()
+            path2.move(to: CGPoint(x:moveToLine2X , y: moveToLine2Y))
+            path2.addLine(to: CGPoint(x: addLine2X, y: addLine2Y))
+            self.line2Node.path = path2.cgPath
+            cat1.position = CGPoint(x: CGFloat(-422.193), y: CGFloat(-80.956))
+            //hitbox for randomCAT
+            let bodysize = CGSize(width: cat1.size.width, height: cat1.size.height)
+            cat1.physicsBody = SKPhysicsBody(rectangleOf: bodysize)
+            cat1.physicsBody?.isDynamic = false
+            cat1.name = "cat1"
+            addChild(cat1)
+            let Cat1Movement1 = SKAction.move(to: CGPoint(x: -20, y: 0), duration: 20)
+            cat1.run(Cat1Movement1)
+            let Cat1Movement2 = SKAction.move(to: CGPoint(x: -10, y: 0), duration: 20)
+            cat1.run(Cat1Movement2)
+            self.childNode(withName: "cat2")?.removeFromParent()
+            cat2.position = CGPoint(x: CGFloat(408.206), y: CGFloat(-98.531))
+            //hitbox for randomCAT
+            let cat2hitbox = CGSize(width: cat2.size.width, height: cat2.size.height)
+            cat2.physicsBody = SKPhysicsBody(rectangleOf: cat2hitbox)
+            cat2.physicsBody?.isDynamic = false
+            cat2.name = "cat2"
+            addChild(cat2)
+            let Cat2Movement1 = SKAction.move(to: CGPoint(x: -26, y: 0), duration: 20)
+            cat2.run(Cat2Movement1)
+            let Cat2Movement2 = SKAction.move(to: CGPoint(x: 20, y: 0), duration: 20)
+            cat2.run(Cat2Movement2)
+            lives = lives - 1
+            self.livesNode.text = "Lives:\(lives)"
+            print("total :\(lives)")
+            if(lives == 1) {
+                print("DID BEGIN lIVES")
+                drawLives = true
+                getLives()
+            }
         }
+        
     }
     
     func line1() {
@@ -435,15 +457,17 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         self.line2Node.path = path.cgPath
         
     }
-    
+   
     func circleposition(mouseposition: CGPoint){
-        var circle = SKShapeNode(circleOfRadius: 20)
+        circle = SKShapeNode(circleOfRadius: 20)
         circle.position = mouseposition
         circle.name = "circle"
         circle.strokeColor = SKColor.red
         circle.glowWidth = 1.0
         circle.fillColor = SKColor.clear
+        
         self.addChild(circle)
+        
         
     }
     func spawncats(){
@@ -490,11 +514,8 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     }
     
     func getLives() {
-        
             randomX = Int(arc4random_uniform(UInt32(size.width)))
             randomY = Int(arc4random_uniform(UInt32(size.height)))
-            
-            
             var circle = SKShapeNode(circleOfRadius: 20)
             print("Circle Drawn")
             circle.position.x = CGFloat(randomX)
@@ -507,27 +528,91 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             self.addChild(circle)
             let CircleMovement = SKAction.move(to: CGPoint(x: self.player.position.x, y: self.player.position.y), duration: 8)
             circle.run(CircleMovement)
-            
-            var cat = SKSpriteNode(imageNamed: "cat")
-            
-        
-            cat.position = CGPoint(x: CGFloat(randomX), y: CGFloat(randomY))
+            cat3.position = CGPoint(x: CGFloat(randomX), y: CGFloat(randomY))
             
             //hitbox for randomCAT
-            let bodysize = CGSize(width: cat.size.width, height: cat.size.height)
-            cat.physicsBody = SKPhysicsBody(rectangleOf: bodysize)
-            cat.physicsBody?.isDynamic = false
-            cat.name = "randomcat"
+            let bodysize = CGSize(width: cat3.size.width, height: cat3.size.height)
+            cat3.physicsBody = SKPhysicsBody(rectangleOf: bodysize)
+            cat3.physicsBody?.isDynamic = false
+            cat3.name = "randomcat"
             
-            addChild(cat)
+            addChild(cat3)
         
             //line3()
             print("randomX\(randomX)")
             print("randomy\(randomY)")
             let CatMovement = SKAction.move(to: CGPoint(x: self.player.position.x, y: self.player.position.y), duration: 8)
-            cat.run(CatMovement)
-        
+            cat3.run(CatMovement)
     }
     
     
+    func randomCat1() {
+        print("RandomCat1")
+        Level2RandomXCat1 = Int(arc4random_uniform(UInt32(size.width)))
+        Level2RandomYCat1 = Int(arc4random_uniform(UInt32(size.height)))
+        Level2Cat1.position = CGPoint(x: CGFloat(Level2RandomXCat1), y: CGFloat(Level2RandomYCat1))
+        
+        
+        //draw line-1 for cat-1
+        self.level2line1.lineWidth = 8
+        self.level2line1.lineCap = .round
+        self.level2line1.strokeColor = UIColor.red
+        self.level2line1.name = "level2line1"
+        addChild(level2line1)
+        
+        //draw the animation of line-1
+        let moveAction = SKAction.moveBy(x: CGFloat(Level2RandomXCat1), y: CGFloat(Level2RandomYCat1), duration: 2.5)
+        level2line1.run(moveAction)
+        //draw a line
+        let pathLevel2Cat1 = UIBezierPath()
+        pathLevel2Cat1.move(to: CGPoint(x: 408.206, y: 0))
+        pathLevel2Cat1.addLine(to: CGPoint(x:350, y:0))
+        self.line1Node.path = pathLevel2Cat1.cgPath
+        
+        
+        
+        
+        //hitbox for randomCAT
+        let bodysize = CGSize(width: Level2Cat1.size.width, height: Level2Cat1.size.height)
+        Level2Cat1.physicsBody = SKPhysicsBody(rectangleOf: bodysize)
+        Level2Cat1.physicsBody?.isDynamic = false
+        Level2Cat1.name = "level2cat1"
+        
+        addChild(Level2Cat1)
+        //line3()
+        print("randomX\(Level2RandomXCat1)")
+        print("randomy\(Level2RandomYCat1)")
+        let Level2Cat1Movement = SKAction.move(to: CGPoint(x:self.player.position.x, y: self.player.position.y), duration: 20)
+        Level2Cat1.run(Level2Cat1Movement)
+    }
+    
+    func randomCat2() {
+        print("RandomCat2")
+        Level2RandomXCat2 = Int(arc4random_uniform(UInt32(size.width)))
+        Level2RandomYCat2 = Int(arc4random_uniform(UInt32(size.height)))
+        Level2Cat2.position = CGPoint(x: CGFloat(Level2RandomXCat2), y: CGFloat(Level2RandomYCat2))
+        
+        //hitbox for randomCAT
+        let bodysize = CGSize(width: Level2Cat2.size.width, height: Level2Cat2.size.height)
+        Level2Cat2.physicsBody = SKPhysicsBody(rectangleOf: bodysize)
+        Level2Cat2.physicsBody?.isDynamic = false
+        Level2Cat2.name = "level2cat2"
+        
+        addChild(Level2Cat2)
+        
+        print("randomX\(Level2RandomXCat2)")
+        print("randomy\(Level2RandomYCat2)")
+        let Level2Cat2Movement = SKAction.move(to: CGPoint(x:self.player.position.x, y: self.player.position.y), duration: 20)
+        Level2Cat2.run(Level2Cat2Movement)
+    }
+    func Level2Line1(){
+       
+       
+    }
+    func Level2Line2(){
+        
+    }
+    func Level2Lin3(){
+        
+    }
 }
